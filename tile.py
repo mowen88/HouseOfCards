@@ -324,11 +324,12 @@ class Platform(pygame.sprite.Sprite):
 		self.collide_platforms()
 
 class MovingPlatform(pygame.sprite.Sprite):
-	def __init__(self, game, room, pos, groups, surf, platform_type):
+	def __init__(self, game, room, pos, groups, surf, platform_type, speed):
 		super().__init__(groups)
 		self.game = game
 		self.room = room
 		self.platform_type = platform_type
+		self.speed = speed
 		
 		self.image = pygame.image.load(surf).convert_alpha()
 		self.image = pygame.transform.scale(self.image, (self.image.get_width() * self.game.SCALE, self.image.get_height() * self.game.SCALE))
@@ -340,21 +341,21 @@ class MovingPlatform(pygame.sprite.Sprite):
 		self.vel = pygame.math.Vector2()
 
 	def horizontal(self):
-		if self.timer < 300:
-			self.vel = pygame.math.Vector2(-1,0)
+		if self.timer < 300/self.speed:
+			self.vel = pygame.math.Vector2(-self.speed,0)
 			
-		elif self.timer <= 600:
-			self.vel = pygame.math.Vector2(1,0)
+		elif self.timer <= 600/self.speed:
+			self.vel = pygame.math.Vector2(self.speed,0)
 			
 		else:
 			self.timer = 0
 
 	def vertical(self):
-		if self.timer <= 300:
-			self.vel = pygame.math.Vector2(0, 1)
+		if self.timer < 300/self.speed:
+			self.vel = pygame.math.Vector2(0, self.speed)
 
-		elif self.timer <= 600:
-			self.vel = pygame.math.Vector2(0, -1)
+		elif self.timer < 600/self.speed:
+			self.vel = pygame.math.Vector2(0, -self.speed)
 		else:
 			self.timer = 0
 
@@ -370,6 +371,7 @@ class MovingPlatform(pygame.sprite.Sprite):
 		elif self.platform_type == 'right_left':
 			self.horizontal()
 			self.vel *= -1
+
 			
 
 			# if self.timer <= 300:

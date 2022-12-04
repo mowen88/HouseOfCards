@@ -33,6 +33,7 @@ class Entity(pygame.sprite.Sprite):
 		self.crouching = False
 		self.can_stand = None
 		self.on_platform = False
+		self.platform_speed = 0
 
 		self.invincibility_timer = 0
 		self.invincible_cooldown = 80
@@ -181,41 +182,41 @@ class Entity(pygame.sprite.Sprite):
 
 		elif self.on_platform:
 			if self.platform_move_direction == 'right':
-				if self.moving_right and self.vel.x >= 1:
+				if self.moving_right and self.vel.x >= self.platform_speed:
 					self.vel.x += self.acceleration
 					self.facing = 1
 					
-				elif self.moving_left and self.vel.x <= 1:
+				elif self.moving_left and self.vel.x <= self.platform_speed:
 					self.vel.x -= self.acceleration
 					self.facing = -1
 			
 				elif self.facing == 1:
 					self.vel.x -= self.friction
-					if self.vel.x <= 1:
-						self.vel.x = 1
+					if self.vel.x <= self.platform_speed:
+						self.vel.x = self.platform_speed
 				else:
 					self.vel.x += self.friction
-					if self.vel.x >= 1:
-						self.vel.x = 1
+					if self.vel.x >= self.platform_speed:
+						self.vel.x = self.platform_speed
 
 				
 			elif self.platform_move_direction == 'left':
-				if self.moving_right and self.vel.x >= -1:
+				if self.moving_right and self.vel.x >= -self.platform_speed:
 					self.vel.x += self.acceleration
 					self.facing = 1
 			
-				elif self.moving_left and self.vel.x <= -1:
+				elif self.moving_left and self.vel.x <= -self.platform_speed:
 					self.vel.x -= self.acceleration
 					self.facing = -1
 
 				elif self.facing == 1:
 					self.vel.x -= self.friction
-					if self.vel.x <= -1:
-						self.vel.x = -1
+					if self.vel.x <= -self.platform_speed:
+						self.vel.x = -self.platform_speed
 				else:
 					self.vel.x += self.friction
-					if self.vel.x >= -1:
-						self.vel.x = -1
+					if self.vel.x >= -self.platform_speed:
+						self.vel.x = -self.platform_speed
 
 			elif self.platform_move_direction == 'up' or self.platform_move_direction == 'down':
 				if self.moving_right and self.vel.x >= 0:
@@ -260,6 +261,7 @@ class Entity(pygame.sprite.Sprite):
 		else:
 			left_img = pygame.transform.flip(right_img, True, False)
 			self.image = left_img
+
 
 		if self.on_ground and self.on_right:
 			self.rect = self.image.get_rect(bottomright = self.rect.bottomright)
@@ -316,18 +318,18 @@ class Entity(pygame.sprite.Sprite):
 				if self.on_platform:
 					if not self.crouching:
 						if self.platform_move_direction == 'right':
-							if self.vel.x == 1 or self.on_right or self.on_left:
+							if self.vel.x == self.platform_speed or self.on_right or self.on_left:
 								self.change_state('idle', 0.1, 'loop')	
 							else:
 								self.change_state('run', 0.2, 'loop')
 						elif self.platform_move_direction == 'left':
-							if self.vel.x == -1 or self.on_right or self.on_left:
+							if self.vel.x == -self.platform_speed or self.on_right or self.on_left:
 								self.change_state('idle', 0.1, 'loop')	
 							else:
 								self.change_state('run', 0.2, 'loop')
 
 						if self.platform_move_direction == 'up' or self.platform_move_direction == 'down':
-							if (self.vel.x == 0 or self.on_right or self.on_left) and (self.vel.y >= -1 and self.vel.y <= 1):
+							if (self.vel.x == 0 or self.on_right or self.on_left) and (self.vel.y >= -self.platform_speed and self.vel.y <= self.platform_speed):
 								self.change_state('idle', 0.1, 'loop')	
 							else:
 								self.change_state('run', 0.2, 'loop')
@@ -335,12 +337,12 @@ class Entity(pygame.sprite.Sprite):
 
 					else:
 						if self.platform_move_direction == 'right':
-							if self.vel.x == 1 or self.on_right or self.on_left:
+							if self.vel.x == self.platform_speed or self.on_right or self.on_left:
 								self.change_state('crouching', 0.3, 'end_on_last_frame')
 							else:
 								self.change_state('crawling', 0.2, 'loop')
 						elif self.platform_move_direction == 'left':
-							if self.vel.x == -1 or self.on_right or self.on_left:
+							if self.vel.x == -self.platform_speed or self.on_right or self.on_left:
 								self.change_state('crouching', 0.1, 'end_on_last_frame')
 							else:
 								self.change_state('crawling', 0.2, 'loop')
@@ -387,16 +389,16 @@ class Entity(pygame.sprite.Sprite):
 	def apply_acceleration(self):
 		if self.on_platform:
 			if self.platform_move_direction == 'right':
-				if self.vel.x >= self.speed + 1:
-					self.vel.x = self.speed + 1
-				if self.vel.x <= - self.speed + 1:
-					self.vel.x = - self.speed + 1
+				if self.vel.x >= self.speed + self.platform_speed:
+					self.vel.x = self.speed + self.platform_speed
+				if self.vel.x <= - self.speed + self.platform_speed:
+					self.vel.x = - self.speed + self.platform_speed
 
 			elif self.platform_move_direction == 'left':
-				if self.vel.x >= self.speed - 1:
-					self.vel.x = self.speed - 1
-				if self.vel.x <= -self.speed - 1:
-					self.vel.x = -self.speed - 1
+				if self.vel.x >= self.speed - self.platform_speed:
+					self.vel.x = self.speed - self.platform_speed
+				if self.vel.x <= -self.speed - self.platform_speed:
+					self.vel.x = -self.speed - self.platform_speed
 
 			elif self.platform_move_direction == 'up' or self.platform_move_direction == 'down':
 				if self.vel.x >= self.speed:
@@ -627,14 +629,16 @@ class Entity(pygame.sprite.Sprite):
 					self.on_ground = True
 					self.on_wall = False
 					self.on_platform = True
+					self.platform_speed = platform.speed
 					
-					if platform.vel.x == 1:
+					if platform.vel.x > 0:
 						self.platform_move_direction = 'right'
-					elif platform.vel.x == -1:
+					elif platform.vel.x < 0:
 						self.platform_move_direction = 'left'
-					elif platform.vel.y == 1:
+					elif platform.vel.y > 0:
 						self.platform_move_direction = 'down'
-					elif platform.vel.y == -1:
+						self.vel.y = platform.vel.y
+					elif platform.vel.y < 0:
 						self.platform_move_direction = 'up'
 					else:
 						self.platform_move_direction = 'stationary'
@@ -643,8 +647,9 @@ class Entity(pygame.sprite.Sprite):
 				self.on_platform = False
 		for platform in self.room.moving_platform_sprites:
 			if platform.hitbox.colliderect(self.hitbox): 
-				if self.hitbox.bottom <= platform.hitbox.top + 20 and self.vel.y > 0:
+				if self.hitbox.bottom <= platform.hitbox.top + 16 and self.vel.y > 0:
 					self.on_platform = True
+					self.platform_speed = platform.speed
 
 
 	def move(self, speed):
@@ -660,6 +665,7 @@ class Entity(pygame.sprite.Sprite):
 		self.y_collisions()	
 		self.collide_platforms()
 		self.rect.center = self.hitbox.center
+
 
 		
 
