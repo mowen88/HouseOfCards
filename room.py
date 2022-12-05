@@ -1,8 +1,8 @@
 import pygame, os, csv
 from state import State
 from player import Player, NPC
-from tile import Tile, Coin, Platform, TrickPlatform, MovingPlatform, AnimatedTile, Interact, CollisionTile, Spike, CutsceneCollider, \
-Lever, LeverRocker, Attack, Yoyo, Exit
+from tile import Tile, Coin, Wheel, Platform, TrickPlatform, MovingPlatform, AnimatedTile, \
+Interact, CollisionTile, Spike, CutsceneCollider, Lever, LeverRocker, Attack, Yoyo, Exit
 from ui import UI
 from map import Map
 from camera import Camera
@@ -51,6 +51,7 @@ class Room(State):
 		self.npc_sprites = pygame.sprite.Group()
 		self.cutscene_sprites = pygame.sprite.Group()
 		self.spike_sprites = pygame.sprite.Group()
+		self.wheel_sprites = pygame.sprite.Group()
 		self.enemy_sprites = pygame.sprite.Group()
 		self.exit_sprites = pygame.sprite.Group()
 		self.interact_box_sprites = pygame.sprite.Group()
@@ -127,9 +128,24 @@ class Room(State):
 
 
 						if style == 'hazards':
-							surf = images['blocks'][int(col)]
-							self.spike = Spike(self.game, (x,y), [self.visible_sprites], surf)
-							self.spike_sprites.add(self.spike)
+							if col == '7':
+								self.wheel = Wheel(self.game, self, (x,y), [self.visible_sprites, self.active_sprites], 'img/wheel.png', 'left')
+								self.wheel_sprites.add(self.wheel)
+							elif col == '8':
+								self.wheel = Wheel(self.game, self, (x,y), [self.visible_sprites, self.active_sprites], 'img/wheel.png', 'right')
+								self.wheel_sprites.add(self.wheel)
+							elif col == '9':
+								self.wheel = Wheel(self.game, self, (x,y), [self.visible_sprites, self.active_sprites], 'img/wheel.png', 'up')
+								self.wheel_sprites.add(self.wheel)
+							elif col == '10':
+								self.wheel = Wheel(self.game, self, (x,y), [self.visible_sprites, self.active_sprites], 'img/wheel.png', 'down')
+								self.wheel_sprites.add(self.wheel)
+							else:
+								surf = images['blocks'][int(col)]
+								self.spike = Spike(self.game, (x,y), [self.visible_sprites], surf)
+								self.spike_sprites.add(self.spike)
+
+							
 
 						if style == 'platforms':
 							if col == '0':
@@ -146,16 +162,16 @@ class Room(State):
 								self.lever_sprites.add(sprite)
 
 							if col == '3':
-								sprite = MovingPlatform(self.game, self, (x, y), [self.visible_sprites, self.active_sprites], 'img/platform0.png', 'left_right', 3)
+								sprite = MovingPlatform(self.game, self, (x, y), [self.visible_sprites, self.active_sprites], 'img/platform0.png', 'left_right', 2)
 								self.moving_platform_sprites.add(sprite)
 							if col == '4':
-								sprite = MovingPlatform(self.game, self, (x, y), [self.visible_sprites, self.active_sprites], 'img/platform0.png', 'right_left', 3)
+								sprite = MovingPlatform(self.game, self, (x, y), [self.visible_sprites, self.active_sprites], 'img/platform0.png', 'right_left', 2)
 								self.moving_platform_sprites.add(sprite)
 							if col == '5':
-								sprite = MovingPlatform(self.game, self, (x, y), [self.visible_sprites, self.active_sprites], 'img/platform0.png', 'down_up', 3)
+								sprite = MovingPlatform(self.game, self, (x, y), [self.visible_sprites, self.active_sprites], 'img/platform0.png', 'down_up', 2)
 								self.moving_platform_sprites.add(sprite)
 							if col == '6':
-								sprite = MovingPlatform(self.game, self, (x, y), [self.visible_sprites, self.active_sprites], 'img/platform0.png', 'up_down', 3)
+								sprite = MovingPlatform(self.game, self, (x, y), [self.visible_sprites, self.active_sprites], 'img/platform0.png', 'up_down', 2)
 								self.moving_platform_sprites.add(sprite)
 
 
@@ -313,4 +329,4 @@ class Room(State):
 		# top debug messages
 		self.game.draw_text(self.display_surf, str(self.player.on_platform), ((255,255,255)), 100, (self.game.screen.get_width()*0.33,140))
 		self.game.draw_text(display, str(self.player.platform_move_direction), ((255,255,255)), 100, (self.game.screen.get_width()*0.5,140))
-		self.game.draw_text(display, str(self.player.vel.x), ((255,255,255)), 100, (self.game.screen.get_width()*0.66,140))
+		self.game.draw_text(display, str(self.player.vel), ((255,255,255)), 100, (self.game.screen.get_width()*0.66,140))

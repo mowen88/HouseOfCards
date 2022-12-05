@@ -82,7 +82,59 @@ class Lever(pygame.sprite.Sprite):
 
 		self.rotate_sprite()
 		self.rect.center = self.hitbox.center
+
+class Wheel(pygame.sprite.Sprite):
+	def __init__(self, game, room, pos, groups, surf, direction):
+		super().__init__(groups)
+		self.game = game
+		self.room = room
+		self.direction = direction
+		self.image_type = pygame.image.load(surf).convert_alpha()
+		self.image = pygame.image.load(surf).convert_alpha()
+		self.rect = self.image.get_rect(topleft = pos)
+		self.hitbox = self.rect.inflate(0,0)
+		self.rotate = 0
+
+		self.vel = pygame.math.Vector2()
 		
+
+	def rotate_sprite(self):
+
+		self.rotate += 3
+		self.image = pygame.transform.rotate(self.image_type, self.rotate)
+		self.image = pygame.transform.scale(self.image, (self.image.get_width() * self.game.SCALE, self.image.get_height() * self.game.SCALE))
+		self.rect = self.image.get_rect(center = self.rect.center)
+		self.hitbox.center = self.rect.center
+
+	def move(self):
+		if self.direction == 'right':
+			self.vel.x += 0.1
+			if self.vel.x >= 6:
+				self.direction = 'left'
+
+		elif self.direction == 'left':
+			self.vel.x -= 0.1
+			if self.vel.x <= -5.2:
+				self.direction = 'right'
+
+		if self.direction == 'down':
+			self.vel.y += 0.1
+			if self.vel.y >= 6:
+				self.direction = 'up'
+
+		elif self.direction == 'up':
+			self.vel.y -= 0.1
+			if self.vel.y <= -5.1:
+				self.direction = 'down'
+
+		self.hitbox.x += self.vel.x
+		self.hitbox.y += self.vel.y
+		self.rect = self.hitbox
+
+	def update(self):
+		self.move()
+		self.rotate_sprite()
+				
 class Attack(pygame.sprite.Sprite):
 	def __init__(self, game, room, sprite, pos, groups, surf):
 		super().__init__(groups)
@@ -243,7 +295,6 @@ class Particle(AnimatedTile):
 	def update(self):
 		self.animate()
 
-
 class Coin(AnimatedTile):
 	def __init__(self, game, room, pos, groups, path):
 		super().__init__(game, room, pos, groups, path)
@@ -310,15 +361,16 @@ class Platform(pygame.sprite.Sprite):
 		self.hitbox = self.rect.inflate(0, 0)
 
 	def collide_platforms(self):
-		#collided = pygame.sprite.spritecollide(self.room.target, self.room.trick_platform_sprites, False)
-		if self.hitbox.colliderect(self.room.target.hitbox): 
-			if self.room.target.hitbox.bottom <= self.hitbox.top + 16 and self.room.target.vel.y >= 0:
-					self.on_platform = True
-					self.room.target.cyote_timer = 0
-					self.room.target.vel.y = 0
-					self.room.target.hitbox.bottom = self.hitbox.top +1
-					self.room.target.on_ground = True
-					self.room.target.on_wall = False
+		if self.room.player.alive:
+			#collided = pygame.sprite.spritecollide(self.room.target, self.room.trick_platform_sprites, False)
+			if self.hitbox.colliderect(self.room.target.hitbox): 
+				if self.room.target.hitbox.bottom <= self.hitbox.top + 16 and self.room.target.vel.y >= 0:
+						self.on_platform = True
+						self.room.target.cyote_timer = 0
+						self.room.target.vel.y = 0
+						self.room.target.hitbox.bottom = self.hitbox.top +1
+						self.room.target.on_ground = True
+						self.room.target.on_wall = False
 
 	def update(self):
 		self.collide_platforms()
@@ -372,8 +424,6 @@ class MovingPlatform(pygame.sprite.Sprite):
 			self.horizontal()
 			self.vel *= -1
 
-			
-
 			# if self.timer <= 300:
 			# 	self.vel = pygame.math.Vector2(1, 0)
 
@@ -385,8 +435,6 @@ class MovingPlatform(pygame.sprite.Sprite):
 
 			# elif self.timer > 900 and self.timer <= 1200:
 			# 	self.vel = pygame.math.Vector2(0, -1)
-
-	
 
 		self.hitbox.x += self.vel.x
 		self.hitbox.y += self.vel.y
@@ -409,16 +457,17 @@ class TrickPlatform(AnimatedTile):
 		self.hitbox = self.rect.inflate(0,5)
 
 	def collide_platforms(self):
-		#collided = pygame.sprite.spritecollide(self.room.target, self.room.trick_platform_sprites, False)
-		if self.hitbox.colliderect(self.room.target.hitbox): 
-			if self.room.target.hitbox.bottom <= self.hitbox.top + 16 and self.room.target.vel.y >= 0:
-				if self.frame_index < 8:
-					self.on_platform = True
-					self.room.target.cyote_timer = 0
-					self.room.target.vel.y = 0
-					self.room.target.hitbox.bottom = self.hitbox.top +1
-					self.room.target.on_ground = True
-					self.room.target.on_wall = False
+		if self.room.player.alive:
+			#collided = pygame.sprite.spritecollide(self.room.target, self.room.trick_platform_sprites, False)
+			if self.hitbox.colliderect(self.room.target.hitbox): 
+				if self.room.target.hitbox.bottom <= self.hitbox.top + 16 and self.room.target.vel.y >= 0:
+					if self.frame_index < 8:
+						self.on_platform = True
+						self.room.target.cyote_timer = 0
+						self.room.target.vel.y = 0
+						self.room.target.hitbox.bottom = self.hitbox.top +1
+						self.room.target.on_ground = True
+						self.room.target.on_wall = False
 
 	def animate(self):
 		if self.on_platform:

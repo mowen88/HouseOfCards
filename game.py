@@ -6,7 +6,6 @@ from title import Title
 from room import Room
 from dialogue import Dialogue
 
-
 class Game():
 	def __init__(self):
 

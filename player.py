@@ -65,14 +65,19 @@ class Player(Entity):
 					self.room.reduce_health(1)
 					self.invincible = True
 
-	def hit_spikes(self):
-		for spike in self.room.spike_sprites:
-			if spike.hitbox.colliderect(self.hitbox):
-				if not self.invincible:
-					self.room.reduce_health(1)
-					self.invincible = True
-					self.die()
+	def hit_hazards(self):
+		if self.alive:
+			for spike in self.room.spike_sprites:
+				if spike.hitbox.colliderect(self.hitbox):
+					if not self.invincible:
+						self.room.reduce_health(1)
+						self.die()
 
+			for wheel in self.room.wheel_sprites:
+				if self.get_distance_direction_and_angle(wheel)[0] <= 60:
+					if not self.invincible:
+						self.room.reduce_health(1)
+						self.die()
 
 			
 	def update(self):
@@ -87,7 +92,7 @@ class Player(Entity):
 		self.cooldowns()
 		self.timers()
 		self.set_state()
-		self.hit_spikes()
+		self.hit_hazards()
 		self.enemy_collision_knockback()
 		self.move(self.speed)
 		self.animate(self.frame_rate)

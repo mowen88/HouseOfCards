@@ -380,11 +380,11 @@ class Entity(pygame.sprite.Sprite):
 			self.change_state('death', 0.2, 'loop')
 
 	def apply_gravity(self):
-		if not self.on_platform:
-			self.vel.y += self.gravity
-			self.rect.y += self.vel.y
-			if self.vel.y > self.max_fall_speed:
-				self.vel.y = self.max_fall_speed
+		
+		self.vel.y += self.gravity
+		self.rect.y += self.vel.y
+		if self.vel.y > self.max_fall_speed:
+			self.vel.y = self.max_fall_speed
 
 	def apply_acceleration(self):
 		if self.on_platform:
@@ -567,8 +567,12 @@ class Entity(pygame.sprite.Sprite):
 		if self.alive:
 			for sprite in self.room.spike_sprites:
 				if sprite.hitbox.colliderect(self):
-					self.alive = False
-					self.die()
+					if not self.invincible:
+						self.die()
+			for wheel in self.room.wheel_sprites:
+				if self.get_distance_direction_and_angle(wheel)[0] <= 60:
+					if not self.invincible:
+						self.die()
 
 	def get_distance_direction_and_angle(self, target):
 		vel_x = self.vel.x
@@ -619,37 +623,38 @@ class Entity(pygame.sprite.Sprite):
 				self.can_stand = False
 
 	def collide_platforms(self):
-		#collided = pygame.sprite.spritecollide(self.room.target, self.room.trick_platform_sprites, False)
-		for platform in self.room.moving_platform_sprites:
-			if platform.hitbox.colliderect(self.hitbox): 
-				if self.hitbox.bottom <= platform.hitbox.top + 16 and self.vel.y > 0:
-					self.hitbox.bottom = platform.hitbox.top +1
-					self.vel.y = 1
-					self.cyote_timer = 0
-					self.on_ground = True
-					self.on_wall = False
-					self.on_platform = True
-					self.platform_speed = platform.speed
-					
-					if platform.vel.x > 0:
-						self.platform_move_direction = 'right'
-					elif platform.vel.x < 0:
-						self.platform_move_direction = 'left'
-					elif platform.vel.y > 0:
-						self.platform_move_direction = 'down'
-						self.vel.y = platform.vel.y
-					elif platform.vel.y < 0:
-						self.platform_move_direction = 'up'
-					else:
-						self.platform_move_direction = 'stationary'
+		if self.alive:
+			#collided = pygame.sprite.spritecollide(self.room.target, self.room.trick_platform_sprites, False)
+			for platform in self.room.moving_platform_sprites:
+				if platform.hitbox.colliderect(self.hitbox): 
+					if self.hitbox.bottom <= platform.hitbox.top + 16 and self.vel.y > 0:
+						self.hitbox.bottom = platform.hitbox.top +1
+						self.vel.y = 1
+						self.cyote_timer = 0
+						self.on_ground = True
+						self.on_wall = False
+						self.on_platform = True
+						self.platform_speed = platform.speed
+						
+						if platform.vel.x > 0:
+							self.platform_move_direction = 'right'
+						elif platform.vel.x < 0:
+							self.platform_move_direction = 'left'
+						elif platform.vel.y > 0:
+							self.platform_move_direction = 'down'
+							self.vel.y = platform.vel.y
+						elif platform.vel.y < 0:
+							self.platform_move_direction = 'up'
+						else:
+							self.platform_move_direction = 'stationary'
 
-			else:
-				self.on_platform = False
-		for platform in self.room.moving_platform_sprites:
-			if platform.hitbox.colliderect(self.hitbox): 
-				if self.hitbox.bottom <= platform.hitbox.top + 16 and self.vel.y > 0:
-					self.on_platform = True
-					self.platform_speed = platform.speed
+				else:
+					self.on_platform = False
+			for platform in self.room.moving_platform_sprites:
+				if platform.hitbox.colliderect(self.hitbox): 
+					if self.hitbox.bottom <= platform.hitbox.top + 16 and self.vel.y > 0:
+						self.on_platform = True
+						self.platform_speed = platform.speed
 
 
 	def move(self, speed):
