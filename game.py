@@ -6,6 +6,7 @@ from title import Title
 from room import Room
 from dialogue import Dialogue
 
+
 class Game():
 	def __init__(self):
 
@@ -14,7 +15,7 @@ class Game():
 		self.TILESIZE = 16 * self.SCALE
 		self.HEIGHT = 288 * self.SCALE
 		self.WIDTH = self.HEIGHT/9*15
-		self.FPS = 60
+		self.FPS = 60 
 		self.BLACK = ((29, 17, 26))
 		self.WHITE = ((255, 248, 232)) 
 		self.BLUE = ((76, 76, 228))
@@ -26,18 +27,17 @@ class Game():
 
 		self.running, self.playing = True, True
 		self.actions = {'F4': False, 'left': False, 'right': False, 'up': False, 'down': False, 'return': False, 'backspace': False,\
-		 'space': False, 'x': False, 'z': False, 'c': False, 'm': False, 'escape': False} 
+		 'space': False, 'x': False, 'z': False, 'c': False, 'm': False, 'i': False, 'escape': False} 
 		
 		with open('data_dicts/dialogue.txt') as f: self.dialog_dict = eval(f.read())
 
 		self.cutscene_data = {0:(pygame.Rect(300, 400, 20, 100))}
 		self.cutscenes_completed = []
 		self.current_room = 'test'
-		
 		self.room_transition_speed = 20
 		self.spawn_point = 0
 
-		self.data = {'max_health': 5, 'coins': 0}
+		self.data = {'max_health': 5, 'coins': 0, 'bag': False, 'max_items': 3, 'items':['peg', 'bread','brush']} #,'bean', 'boots'
 
 		self.start_health = 5
 		if self.data['max_health']:
@@ -119,6 +119,8 @@ class Game():
 					self.actions['c'] = True
 				elif event.key == pygame.K_m:
 					self.actions['m'] = True
+				elif event.key == pygame.K_i:
+					self.actions['i'] = True
 
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT:
@@ -145,6 +147,8 @@ class Game():
 					self.actions['c'] = False
 				elif event.key == pygame.K_m:
 					self.actions['m'] = False
+				elif event.key == pygame.K_i:
+					self.actions['i'] = False
 
 	def update(self):
 		self.stack[-1].update(self.actions)

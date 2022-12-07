@@ -5,6 +5,53 @@ class RoomSprite(pygame.sprite.Sprite):
 	def __init__(self, pos, surf):
 		self.image = pygame.image.load(surf).convert_alpha()
 		self.rect = self.image.get_rect(topleft = pos)
+		self.vel = pygame.math.Vector2()
+
+class Inventory():
+	def __init__(self, game):
+		self.game = game
+
+
+		self.item_images = []
+
+		if self.game.data['bag'] == True:
+			self.game.data['max_items'] = 8
+			self.inventory_box_surf = pygame.image.load(f'img/ui/inventory_box.png').convert_alpha()
+		else:
+			self.game.data['max_items'] = 5
+			self.inventory_box_surf = pygame.image.load(f'img/ui/inventory_box_small.png').convert_alpha()
+		self.inventory_box_surf = pygame.transform.scale(self.inventory_box_surf, (self.inventory_box_surf.get_width() * self.game.SCALE, self.inventory_box_surf.get_height() * self.game.SCALE))
+		self.inventory_box_rect = self.inventory_box_surf.get_rect(center = (self.game.WIDTH * 0.5, self.game.HEIGHT * 0.75))
+
+
+		for image in self.game.data['items']:
+			text_img = self.game.font.render(str(image), True, self.game.BLACK)
+			item_img = pygame.image.load(f'img/ui/items/{image}.png').convert_alpha()
+			item_img = pygame.transform.scale(item_img, (item_img.get_width() * self.game.SCALE, item_img.get_height() * self.game.SCALE))
+			self.item_images.append(item_img)
+
+		self.offset_x = 120
+		self.offset_y = self.inventory_box_rect.y + 80
+
+		print(len(self.item_images))
+
+	def inventory_display(self):
+		self.game.screen.blit(self.inventory_box_surf, self.inventory_box_rect)
+
+		for slot in range(self.game.data['max_items']):
+			if slot < len(self.item_images):
+				img = self.item_images[slot]	
+			else:
+				img = pygame.Surface((80, 80))
+				img.fill(self.game.BLUE)
+			slot *= self.offset_x
+			self.game.screen.blit(img, (self.inventory_box_rect.x - 60 + slot + self.offset_x, self.offset_y))
+
+	
+	def render(self):
+		self.inventory_display()
+
+
 
 class Map(State):
 	def __init__(self, game, room):
@@ -13,7 +60,11 @@ class Map(State):
 		self.room = room
 		self.display_surf = pygame.display.get_surface()
 		pos = (self.game.WIDTH // 12, self.game.HEIGHT // 12) # split the screen into 12x12 grid to place room sprites easily
+		
+		self.inventory = Inventory(self.game)
+
 		self.rooms = {
+		'test': RoomSprite((pos[0] * 8, pos[1] * 4), 'rooms/test/map_piece.png'),
 		'jail': RoomSprite((pos[0] * 8, pos[1] * 4), 'rooms/jail/map_piece.png'),
 		'courtroom': RoomSprite((pos[0] * 4, pos[1] * 4), 'rooms/courtroom/map_piece.png'),
 		'hallway': RoomSprite((pos[0] * 1, pos[1] * 4), 'rooms/hallway/map_piece.png'),
@@ -48,12 +99,15 @@ class Map(State):
 		self.game.reset_keys()
 
 	def render(self, display):
-		self.display_surf.fill(self.game.BLACK)
+		self.display_surf.fill(self.game.WHITE)
 		# self.prev_state.prev_state.render(display)
 		#self.prev_state.render(display)
 
 		self.show_rooms()
+		#self.inventory.inventory_display()
 		self.display_surf.blit(self.marker_surf, self.marker_rect)
+
+
 		
 
 	

@@ -113,11 +113,17 @@ class Entity(pygame.sprite.Sprite):
 			if self.game.actions['left'] == False:
 				self.moving_left = False
 
-				#show map
+			#show map
 			if self.game.actions['m']:
 				new_state = Map(self.game, self.room)
 				new_state.enter_state()
 				self.game.actions['m'] = False
+
+			# show inventory
+			if self.game.actions['i']:
+				self.room.inventory_showing = True
+			else:
+				self.room.inventory_showing = False
 
 			# attack input
 			if self.game.actions['z']:
@@ -627,7 +633,7 @@ class Entity(pygame.sprite.Sprite):
 			#collided = pygame.sprite.spritecollide(self.room.target, self.room.trick_platform_sprites, False)
 			for platform in self.room.moving_platform_sprites:
 				if platform.hitbox.colliderect(self.hitbox): 
-					if self.hitbox.bottom <= platform.hitbox.top + 16 and self.vel.y > 0:
+					if self.hitbox.bottom <= platform.hitbox.top + 18 and self.vel.y > 0:
 						self.hitbox.bottom = platform.hitbox.top +1
 						self.vel.y = 1
 						self.cyote_timer = 0

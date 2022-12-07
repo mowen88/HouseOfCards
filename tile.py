@@ -16,6 +16,13 @@ class LeverRocker(pygame.sprite.Sprite):
 		self.image = pygame.transform.scale(self.image, (self.image.get_width() * self.game.SCALE, self.image.get_height() * self.game.SCALE))
 		self.rect = self.image.get_rect(topleft = pos)
 
+class WheelRunner(pygame.sprite.Sprite):
+	def __init__(self, game, pos, groups, surf):
+		super().__init__(groups)
+		self.game = game
+		self.image = pygame.image.load(surf).convert_alpha()
+		self.rect = self.image.get_rect(center = pos)
+
 class CollisionTile(pygame.sprite.Sprite):
 	def __init__(self, game, pos, groups, surf = pygame.Surface((48, 48))):
 		super().__init__(groups)
@@ -97,9 +104,7 @@ class Wheel(pygame.sprite.Sprite):
 
 		self.vel = pygame.math.Vector2()
 		
-
 	def rotate_sprite(self):
-
 		self.rotate += 3
 		self.image = pygame.transform.rotate(self.image_type, self.rotate)
 		self.image = pygame.transform.scale(self.image, (self.image.get_width() * self.game.SCALE, self.image.get_height() * self.game.SCALE))
@@ -114,7 +119,7 @@ class Wheel(pygame.sprite.Sprite):
 
 		elif self.direction == 'left':
 			self.vel.x -= 0.1
-			if self.vel.x <= -5.2:
+			if self.vel.x <= -5.1:
 				self.direction = 'right'
 
 		if self.direction == 'down':
@@ -134,6 +139,7 @@ class Wheel(pygame.sprite.Sprite):
 	def update(self):
 		self.move()
 		self.rotate_sprite()
+
 				
 class Attack(pygame.sprite.Sprite):
 	def __init__(self, game, room, sprite, pos, groups, surf):
@@ -364,7 +370,7 @@ class Platform(pygame.sprite.Sprite):
 		if self.room.player.alive:
 			#collided = pygame.sprite.spritecollide(self.room.target, self.room.trick_platform_sprites, False)
 			if self.hitbox.colliderect(self.room.target.hitbox): 
-				if self.room.target.hitbox.bottom <= self.hitbox.top + 16 and self.room.target.vel.y >= 0:
+				if self.room.target.hitbox.bottom <= self.hitbox.top + 18 and self.room.target.vel.y >= 0:
 						self.on_platform = True
 						self.room.target.cyote_timer = 0
 						self.room.target.vel.y = 0
@@ -460,7 +466,7 @@ class TrickPlatform(AnimatedTile):
 		if self.room.player.alive:
 			#collided = pygame.sprite.spritecollide(self.room.target, self.room.trick_platform_sprites, False)
 			if self.hitbox.colliderect(self.room.target.hitbox): 
-				if self.room.target.hitbox.bottom <= self.hitbox.top + 16 and self.room.target.vel.y >= 0:
+				if self.room.target.hitbox.bottom <= self.hitbox.top + 18 and self.room.target.vel.y >= 0:
 					if self.frame_index < 8:
 						self.on_platform = True
 						self.room.target.cyote_timer = 0

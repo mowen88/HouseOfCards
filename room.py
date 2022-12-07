@@ -1,9 +1,9 @@
 import pygame, os, csv
 from state import State
 from player import Player, NPC
-from tile import Tile, Coin, Wheel, Platform, TrickPlatform, MovingPlatform, AnimatedTile, \
+from tile import Tile, Coin, Wheel, WheelRunner, Platform, TrickPlatform, MovingPlatform, AnimatedTile, \
 Interact, CollisionTile, Spike, CutsceneCollider, Lever, LeverRocker, Attack, Yoyo, Exit
-from ui import UI
+from ui import UI, Inventory
 from map import Map
 from camera import Camera
 from dialogue import Dialogue
@@ -39,6 +39,7 @@ class Room(State):
 		self.fade_surf.fill(self.game.BLACK)
 
 		self.cutscene_running = False
+		self.inventory_showing = False
 		self.dialog_running = False
 		self.npc_collided = False
 		self.fade_timer = 0
@@ -65,6 +66,7 @@ class Room(State):
 		self.create_map()
 
 		self.ui = UI(self.game)
+		self.inventory = Inventory(self.game, self)
 
 		#stop certain sprite being created when room loads
 		self.create_attack()
@@ -129,17 +131,22 @@ class Room(State):
 
 						if style == 'hazards':
 							if col == '7':
-								self.wheel = Wheel(self.game, self, (x,y), [self.visible_sprites, self.active_sprites], 'img/wheel.png', 'left')
-								self.wheel_sprites.add(self.wheel)
+								WheelRunner(self.game, (x - 146,y + 13), [self.visible_sprites], 'img/tiles/wheel_runner/horizontal.png')
+								wheel = Wheel(self.game, self, (x,y), [self.visible_sprites, self.active_sprites], 'img/wheel.png', 'left')
+								self.wheel_sprites.add(wheel)
+
 							elif col == '8':
-								self.wheel = Wheel(self.game, self, (x,y), [self.visible_sprites, self.active_sprites], 'img/wheel.png', 'right')
-								self.wheel_sprites.add(self.wheel)
+								WheelRunner(self.game, (x + 172,y + 13), [self.visible_sprites], 'img/tiles/wheel_runner/horizontal.png')
+								wheel = Wheel(self.game, self, (x,y), [self.visible_sprites, self.active_sprites], 'img/wheel.png', 'right')
+								self.wheel_sprites.add(wheel)
 							elif col == '9':
-								self.wheel = Wheel(self.game, self, (x,y), [self.visible_sprites, self.active_sprites], 'img/wheel.png', 'up')
-								self.wheel_sprites.add(self.wheel)
+								WheelRunner(self.game, (x + 13,y - 146), [self.visible_sprites], 'img/tiles/wheel_runner/vertical.png')
+								wheel = Wheel(self.game, self, (x,y), [self.visible_sprites, self.active_sprites], 'img/wheel.png', 'up')
+								self.wheel_sprites.add(wheel)
 							elif col == '10':
-								self.wheel = Wheel(self.game, self, (x,y), [self.visible_sprites, self.active_sprites], 'img/wheel.png', 'down')
-								self.wheel_sprites.add(self.wheel)
+								WheelRunner(self.game, (x + 13,y + 172), [self.visible_sprites], 'img/tiles/wheel_runner/vertical.png')
+								wheel = Wheel(self.game, self, (x,y), [self.visible_sprites, self.active_sprites], 'img/wheel.png', 'down')
+								self.wheel_sprites.add(wheel)
 							else:
 								surf = images['blocks'][int(col)]
 								self.spike = Spike(self.game, (x,y), [self.visible_sprites], surf)
@@ -320,11 +327,13 @@ class Room(State):
 		self.enemy_hit_logic()
 
 
+
 	def render(self, display):
 		self.visible_sprites.offset_draw(self.target.rect.center)
 		#self.create_yoyo_line()
 		self.collide_npc_render_box()
 		self.ui.render()
+		self.inventory.render()
 		self.run_fade()	
 		# top debug messages
 		self.game.draw_text(self.display_surf, str(self.player.on_platform), ((255,255,255)), 100, (self.game.screen.get_width()*0.33,140))
