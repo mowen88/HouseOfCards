@@ -169,16 +169,16 @@ class Room(State):
 								self.lever_sprites.add(sprite)
 
 							if col == '3':
-								sprite = MovingPlatform(self.game, self, (x, y), [self.visible_sprites, self.active_sprites], 'img/platform0.png', 'left_right', 2)
+								sprite = MovingPlatform(self.game, self, (x, y), [self.visible_sprites, self.active_sprites], 'img/platform0.png', 'left_right', 1)
 								self.moving_platform_sprites.add(sprite)
-							if col == '4':
-								sprite = MovingPlatform(self.game, self, (x, y), [self.visible_sprites, self.active_sprites], 'img/platform0.png', 'right_left', 2)
-								self.moving_platform_sprites.add(sprite)
+							# if col == '4':
+							# 	sprite = MovingPlatform(self.game, self, (x, y), [self.visible_sprites, self.active_sprites], 'img/platform0.png', 'right_left', 1)
+							# 	self.moving_platform_sprites.add(sprite)
 							if col == '5':
-								sprite = MovingPlatform(self.game, self, (x, y), [self.visible_sprites, self.active_sprites], 'img/platform0.png', 'down_up', 2)
+								sprite = MovingPlatform(self.game, self, (x, y), [self.visible_sprites, self.active_sprites], 'img/platform0.png', 'down_up', 1)
 								self.moving_platform_sprites.add(sprite)
 							if col == '6':
-								sprite = MovingPlatform(self.game, self, (x, y), [self.visible_sprites, self.active_sprites], 'img/platform0.png', 'up_down', 2)
+								sprite = MovingPlatform(self.game, self, (x, y), [self.visible_sprites, self.active_sprites], 'img/platform0.png', 'up_down', 1)
 								self.moving_platform_sprites.add(sprite)
 
 
@@ -186,9 +186,9 @@ class Room(State):
 	
 
 						if style == 'enemies':
-							if col == '0':
-								self.enemy_red = FlyingEnemy(self.game, self, 'enemy', (x, y), [self.visible_sprites, self.active_sprites], self.obstacle_sprites)
-								self.enemy_sprites.add(self.enemy_red)
+							# if col == '0':
+							# 	self.enemy_red = FlyingEnemy(self.game, self, 'enemy', (x, y), [self.visible_sprites, self.active_sprites], self.obstacle_sprites)
+							# 	self.enemy_sprites.add(self.enemy_red)
 
 							if col == '1':
 								self.walking_enemy = WalkingEnemy(self.game, self, 'club_guard', (x, y), [self.visible_sprites, self.active_sprites], self.obstacle_sprites)
@@ -336,6 +336,6 @@ class Room(State):
 		self.inventory.render()
 		self.run_fade()	
 		# top debug messages
-		self.game.draw_text(self.display_surf, str(self.player.on_platform), ((255,255,255)), 100, (self.game.screen.get_width()*0.33,140))
-		self.game.draw_text(display, str(self.player.platform_move_direction), ((255,255,255)), 100, (self.game.screen.get_width()*0.5,140))
-		self.game.draw_text(display, str(self.player.vel), ((255,255,255)), 100, (self.game.screen.get_width()*0.66,140))
+		self.game.draw_text(self.display_surf, str(self.player.platform_speed.x), ((255,255,255)), 100, (self.game.screen.get_width()*0.33,140))
+		self.game.draw_text(display, str(self.player.vel.y), ((255,255,255)), 100, (self.game.screen.get_width()*0.5,140))
+		self.game.draw_text(display, str(self.player.on_platform), ((255,255,255)), 100, (self.game.screen.get_width()*0.66,140))

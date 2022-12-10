@@ -74,7 +74,7 @@ class Player(Entity):
 						self.die()
 
 			for wheel in self.room.wheel_sprites:
-				if self.get_distance_direction_and_angle(wheel)[0] <= 60:
+				if self.get_distance_direction_and_angle(wheel)[0] <= 52:
 					if not self.invincible:
 						self.room.reduce_health(1)
 						self.die()

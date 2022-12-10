@@ -310,6 +310,7 @@ class Coin(AnimatedTile):
 		self.bounce_height = random.uniform(-10,-6)
 		self.state = 'bouncing'
 		self.acceleration = 0
+		self.hitbox = self.rect.inflate(0, 0)
 
 		self.bounce()
 		
@@ -395,8 +396,34 @@ class MovingPlatform(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect(topleft = pos)
 		self.hitbox = self.rect.inflate(0,0)
 		self.timer = 0
+		self.acceleration = 'slowing'
 
 		self.vel = pygame.math.Vector2()
+
+	def move(self):
+		if self.platform_type == 'right_left':
+			self.vel.x += 0.1
+			if self.vel.x >= 6:
+				self.platform_type = 'left_right'
+
+		elif self.platform_type == 'left_right':
+			self.vel.x -= 0.1
+			if self.vel.x <= -5.1:
+				self.platform_type = 'right_left'
+
+		if self.platform_type == 'down_up':
+			self.vel.y += 0.1
+			if self.vel.y >= 6:
+				self.platform_type = 'up_down'
+
+		elif self.platform_type == 'up_down':
+			self.vel.y -= 0.1
+			if self.vel.y <= -5.1:
+				self.platform_type = 'down_up'
+
+		self.hitbox.x += self.vel.x
+		self.hitbox.y += self.vel.y
+		self.rect = self.hitbox
 
 	def horizontal(self):
 		if self.timer < 300/self.speed:
@@ -417,37 +444,38 @@ class MovingPlatform(pygame.sprite.Sprite):
 		else:
 			self.timer = 0
 
-	def move(self):
-		self.timer += 1
-		if self.platform_type == 'down_up':
-			self.vertical()
-		elif self.platform_type == 'up_down':
-			self.vertical()
-			self.vel *= -1
-		elif self.platform_type == 'left_right':
-			self.horizontal()
-		elif self.platform_type == 'right_left':
-			self.horizontal()
-			self.vel *= -1
+	# def move(self):
+	# 	self.timer += 1
+	# 	if self.platform_type == 'down_up':
+	# 		self.vertical()
+	# 	elif self.platform_type == 'up_down':
+	# 		self.vertical()
+	# 		self.vel *= -1
+	# 	elif self.platform_type == 'left_right':
+	# 		self.horizontal()
+	# 	elif self.platform_type == 'right_left':
+	# 		self.horizontal()
+	# 		self.vel *= -1
 
-			# if self.timer <= 300:
-			# 	self.vel = pygame.math.Vector2(1, 0)
+	# 		# if self.timer <= 300:
+	# 		# 	self.vel = pygame.math.Vector2(1, 0)
 
-			# elif self.timer >300 and self.timer <=600:
-			# 	self.vel = pygame.math.Vector2(0, 1)
+	# 		# elif self.timer >300 and self.timer <=600:
+	# 		# 	self.vel = pygame.math.Vector2(0, 1)
 		
-			# elif self.timer >600 and self.timer <= 900:
-			# 	self.vel = pygame.math.Vector2(-1, 0)
+	# 		# elif self.timer >600 and self.timer <= 900:
+	# 		# 	self.vel = pygame.math.Vector2(-1, 0)
 
-			# elif self.timer > 900 and self.timer <= 1200:
-			# 	self.vel = pygame.math.Vector2(0, -1)
+	# 		# elif self.timer > 900 and self.timer <= 1200:
+	# 		# 	self.vel = pygame.math.Vector2(0, -1)
 
-		self.hitbox.x += self.vel.x
-		self.hitbox.y += self.vel.y
-		self.rect.center = self.hitbox.center
+	# 	self.hitbox.x += self.vel.x
+	# 	self.hitbox.y += self.vel.y
+	# 	self.rect.center = self.hitbox.center
 
 	def update(self):
 		self.move()
+
 		
 class TrickPlatform(AnimatedTile):
 	def __init__(self, game, room, pos, groups, path):
